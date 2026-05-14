@@ -1,0 +1,9 @@
+case "${ACTION}" in
+post)
+	setcap cap_sys_admin=ep /usr/bin/gsr-kms-server
+	if [ $? -ne 0 ]; then
+		echo "ERROR: failed to set cap_sys_admin capability on gsr-kms-server."
+		exit 1
+	fi
+	;;
+esac

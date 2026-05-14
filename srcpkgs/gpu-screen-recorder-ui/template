@@ -1,0 +1,24 @@
+# Template file for 'gpu-screen-recorder-ui'
+pkgname=gpu-screen-recorder-ui
+version=1.12.0
+revision=1
+build_style=meson
+hostmakedepends="pkg-config meson desktop-file-utils wayland-devel"
+makedepends="pango-devel libX11-devel libXrandr-devel libXrender-devel libXcomposite-devel
+	libXfixes-devel libXext-devel libXi-devel libXcursor-devel libxkbcommon-devel 
+	libglvnd-devel pulseaudio-devel libdrm-devel dbus-devel libcap-devel wayland-devel"
+depends="gpu-screen-recorder gpu-screen-recorder-notification"
+short_desc="ShadowPlay-like UI for gpu-screen-recorder"
+maintainer="cherrybtw <nonopenoid123456789@gmail.com>"
+license="GPL-3.0-only, OFL-1.1, CC-BY-SA-3.0, CC0-1.0, CC-BY-4.0"
+homepage="https://git.dec05eba.com/gpu-screen-recorder-ui/about"
+distfiles="https://dec05eba.com/snapshot/gpu-screen-recorder-ui.git.${version}.tar.gz"
+checksum=514bc761626d9ac0c8ad2a036692df9073bf2d4cfad56f78845f2884e72ee188
+
+post_patch() {
+	vsed -i "s/meson.add_install_script/# meson.add_install_script/" meson.build
+	vsed -i '1s|^|#include <sys/types.h>\n|' include/DesktopEnvironment/DesktopEnvironmentKde.hpp
+	vsed -i '/^#include <fcntl.h>/i #include <unistd.h>' src/DesktopEnvironment/DesktopEnvironmentKde.cpp
+	vsed -i '/^#include <fcntl.h>/i #include <unistd.h>' src/DesktopEnvironment/DesktopEnvironmentGnome.cpp
+}
+

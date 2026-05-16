@@ -1,6 +1,6 @@
 # Template file for 'gpu-screen-recorder'
 pkgname=gpu-screen-recorder
-version=5.13.6
+version=5.13.7
 revision=1
 build_style=meson
 hostmakedepends="meson ninja pkg-config wayland-devel"
@@ -13,7 +13,7 @@ maintainer="cherrybtw <nonopenoid123456789@gmail.com>"
 license="GPL-3.0-only"
 homepage="https://git.dec05eba.com/gpu-screen-recorder/about"
 distfiles="https://dec05eba.com/snapshot/gpu-screen-recorder.git.${version}.tar.gz"
-checksum=f23391d985aa61eb24c114ee31e89119ae0bbaf995e7b4b9a8061335c340bcc1
+checksum=587c12e969d9cc94fe12b26b93c7ac8338f1ebdd71491241c9bee45492ffe825
 depends="libcap-progs"
 
 post_patch() {

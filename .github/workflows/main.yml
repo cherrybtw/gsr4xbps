@@ -1,0 +1,109 @@
+name: build
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { host: x86_64,      target: x86_64      }
+          - { host: x86_64-musl, target: x86_64-musl }
+          - { host: x86_64,      target: i686        }
+          - { host: x86_64,      target: aarch64     }
+          - { host: x86_64-musl, target: aarch64-musl }
+          - { host: x86_64,      target: armv7l      }
+          - { host: x86_64-musl, target: armv7l-musl }
+          - { host: x86_64,      target: armv6l      }
+          - { host: x86_64-musl, target: armv6l-musl }
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: free space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/share/swift /usr/local/lib/android
+          sudo rm -rf /opt/ghc /usr/local/.ghcup "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" /opt/hostedtoolcache/
+          sudo rm -rf /usr/local/graalvm/ /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium /usr/local/lib/node_modules
+          sudo docker image prune --all --force
+
+      - name: checkout gsr4xbps
+        uses: actions/checkout@v4
+        with:
+          path: gsr4xbps
+
+      - name: checkout void-packages
+        uses: actions/checkout@v4
+        with:
+          repository: void-linux/void-packages
+          ref: master
+          path: void-packages
+
+      - name: copy packages into srcpkgs
+        run: |
+          cp -rv gsr4xbps/srcpkgs/gpu-screen-recorder void-packages/srcpkgs/
+          cp -rv gsr4xbps/srcpkgs/gpu-screen-recorder-notification void-packages/srcpkgs/
+          cp -rv gsr4xbps/srcpkgs/gpu-screen-recorder-ui void-packages/srcpkgs/
+
+      - name: prepare xbps-static
+        run: |
+          mkdir -p /opt/xbps
+          curl -LO http://repo-default.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz
+          tar xvf xbps-static-latest.x86_64-musl.tar.xz -C /opt/xbps
+          rm xbps-static-latest.x86_64-musl.tar.xz
+
+      - name: build
+        env:
+          XBPS_TARGET_ARCH: ${{ matrix.target }}
+        run: |
+          export PATH="/opt/xbps/usr/bin/:$PATH"
+          cd void-packages
+          if [[ "${{ matrix.host }}" == "${{ matrix.target }}" ]]; then
+            ./xbps-src -A ${{ matrix.host }} binary-bootstrap
+            ./xbps-src pkg -j$(nproc) -A ${{ matrix.host }} gpu-screen-recorder
+            ./xbps-src pkg -j$(nproc) -A ${{ matrix.host }} gpu-screen-recorder-notification
+            ./xbps-src pkg -j$(nproc) -A ${{ matrix.host }} gpu-screen-recorder-ui
+          else
+            ./xbps-src -a ${{ matrix.target }} -A ${{ matrix.host }} binary-bootstrap
+            ./xbps-src pkg -j$(nproc) -a ${{ matrix.target }} -A ${{ matrix.host }} gpu-screen-recorder
+            ./xbps-src pkg -j$(nproc) -a ${{ matrix.target }} -A ${{ matrix.host }} gpu-screen-recorder-notification
+            ./xbps-src pkg -j$(nproc) -a ${{ matrix.target }} -A ${{ matrix.host }} gpu-screen-recorder-ui
+          fi
+
+      - name: determine binpkgs dir
+        id: binpkgs
+        run: |
+          DIR=$(find void-packages/hostdir/binpkgs -name "*.xbps" -printf "%h\n" | sort -u | head -1)
+          echo "dir=$DIR" >> $GITHUB_OUTPUT
+
+      - name: sign
+        env:
+          XBPS_PASSPHRASE: ${{ secrets.SIGN_PASS }}
+          XBPS_TARGET_ARCH: ${{ matrix.target }}
+          PRIV_KEY: ${{ secrets.PRIV_KEY }}
+        working-directory: ${{ steps.binpkgs.outputs.dir }}
+        run: |
+          export PATH="/opt/xbps/usr/bin/:$PATH"
+          PRIVKEY_FILE=$(mktemp)
+          chmod 600 "$PRIVKEY_FILE"
+          printf '%s' "$PRIV_KEY" > "$PRIVKEY_FILE"
+          xbps-rindex -r $PWD
+          xbps-rindex -s --signedby "${{ vars.SIGNEDBY }}" --privkey "$PRIVKEY_FILE" $PWD
+          xbps-rindex -S --privkey "$PRIVKEY_FILE" *.xbps
+          xbps-rindex -c $PWD
+          rm -f "$PRIVKEY_FILE"
+
+      - name: release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: packages
+          make_latest: true
+          files: |
+            ${{ steps.binpkgs.outputs.dir }}/*

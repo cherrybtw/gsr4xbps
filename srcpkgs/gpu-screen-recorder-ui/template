@@ -9,7 +9,7 @@ makedepends="pango-devel libX11-devel libXrandr-devel libXrender-devel libXcompo
 	libglvnd-devel pulseaudio-devel libdrm-devel dbus-devel libcap-devel wayland-devel"
 depends="gpu-screen-recorder gpu-screen-recorder-notification"
 short_desc="ShadowPlay-like UI for gpu-screen-recorder"
-maintainer="cherrybtw <nonopenoid123456789@gmail.com>"
+maintainer="cherrybtw <cherrybtw@proton.me>"
 license="GPL-3.0-only, OFL-1.1, CC-BY-SA-3.0, CC0-1.0, CC-BY-4.0"
 homepage="https://git.dec05eba.com/gpu-screen-recorder-ui/about"
 distfiles="https://dec05eba.com/snapshot/gpu-screen-recorder-ui.git.${version}.tar.gz"

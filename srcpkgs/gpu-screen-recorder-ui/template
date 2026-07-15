@@ -1,6 +1,6 @@
 # Template file for 'gpu-screen-recorder-ui'
 pkgname=gpu-screen-recorder-ui
-version=1.12.5
+version=1.13.0
 revision=1
 build_style=meson
 hostmakedepends="pkg-config meson desktop-file-utils wayland-devel"
@@ -13,7 +13,7 @@ maintainer="cherrybtw <cherrybtw@proton.me>"
 license="GPL-3.0-only, OFL-1.1, CC-BY-SA-3.0, CC0-1.0, CC-BY-4.0"
 homepage="https://git.dec05eba.com/gpu-screen-recorder-ui/about"
 distfiles="https://dec05eba.com/snapshot/gpu-screen-recorder-ui.git.${version}.tar.gz"
-checksum=7ee9a95227f838b3d22d04f817b84d88fe1d70e736dee833b2bd88055ac614c2
+checksum=4e535ab1ec6177e2221d4bbf49581ef51836f1c0d1e1662a52ab7a0346737eab
 
 post_patch() {
 	vsed -i "s/meson.add_install_script/# meson.add_install_script/" meson.build

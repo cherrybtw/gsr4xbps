@@ -10,4 +10,4 @@ maintainer="cherrybtw <cherrybtw@proton.me>"
 license="GPL-3.0-only, OFL-1.1"
 homepage="https://git.dec05eba.com/gpu-screen-recorder-notification/about"
 distfiles="https://dec05eba.com/snapshot/gpu-screen-recorder-notification.git.${version}.tar.gz"
-checksum=98a6864c28782b4c1348487d09057a39ca448312c9abddc45da0f7205d2734d0
+checksum=eb73d2a6f1c5affa3abf593d66658c91131f5748f44519c38afbee160ee689dc

@@ -13,7 +13,7 @@ maintainer="cherrybtw <cherrybtw@proton.me>"
 license="GPL-3.0-only, OFL-1.1, CC-BY-SA-3.0, CC0-1.0, CC-BY-4.0"
 homepage="https://git.dec05eba.com/gpu-screen-recorder-ui/about"
 distfiles="https://dec05eba.com/snapshot/gpu-screen-recorder-ui.git.${version}.tar.gz"
-checksum=aae8a73453f26efd5409256f34c3e995331d92b32867813f8496346c6cc0c965
+checksum=f5e97731712a5cb55e52576a8c6450cbe2181eaa66f3f7d114cf206881d94db1
 
 post_patch() {
 	vsed -i "s/meson.add_install_script/# meson.add_install_script/" meson.build
